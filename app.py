@@ -52,7 +52,7 @@ def build_keras_model(input_shape):
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['Recall'])
     return model
 
-@st.cache_data
+@st.cache_resource
 def load_and_train_models(file):
     df = pd.read_csv(file)
     df = remove_outliers_iqr(df, df.select_dtypes(include=['int64', 'float64']).columns)
