@@ -51,10 +51,7 @@ def build_keras_model(input_shape):
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['Recall'])
     return model
 
-
-
-
-@st.cache_resource
+@st.cache_data
 def load_and_train_models(file):
     df = pd.read_csv(file)
     df = remove_outliers_iqr(df, df.select_dtypes(include=['int64', 'float64']).columns)
@@ -116,3 +113,29 @@ def load_and_train_models(file):
     top3 = results[:3]
 
     return top3, numeric_features, categorical_features, X
+
+if uploaded_file:
+    top3, numeric_features, categorical_features, X_example = load_and_train_models(uploaded_file)
+
+    st.subheader("Top 3 Models by Recall Score:")
+    for name, recall, _ in top3:
+        st.write(f"**{name}**: Recall = {recall:.4f}")
+
+    st.subheader("Make a Prediction")
+    input_data = {}
+    for col in numeric_features:
+        input_data[col] = st.number_input(f"{col}", value=float(X_example[col].mean()))
+    for col in categorical_features:
+        input_data[col] = st.selectbox(f"{col}", options=X_example[col].dropna().unique())
+
+    if st.button("Predict"):
+        input_df = pd.DataFrame([input_data])
+        st.write("Predictions:")
+        for name, _, model in top3:
+            if name == "Neural Network":
+                preprocessor, nn_model = model
+                input_transformed = preprocessor.transform(input_df)
+                pred = (nn_model.predict(input_transformed) > 0.5).astype("int32")[0][0]
+            else:
+                pred = model.predict(input_df)[0]
+            st.write(f"{name}: {'Heart Disease' if pred == 1 else 'No Heart Disease'}")
