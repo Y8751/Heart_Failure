@@ -1,21 +1,33 @@
-import streamlit as st
 import os
 import joblib
 from tensorflow.keras.models import load_model
+import streamlit as st
 
 st.title("📁 Load Saved Model")
 
-# List saved models
-model_files = os.listdir("saved_models")
-selected_file = st.selectbox("Select a saved model", model_files)
+# Define the folder path
+models_path = "saved_models"
 
-# Load the model when button is clicked
-if st.button("Load Model"):
-    if selected_file.endswith(".pkl"):
-        model = joblib.load(f"saved_models/{selected_file}")
-        st.success(f"✅ Sklearn model loaded: {selected_file}")
-    elif selected_file.endswith(".h5"):
-        model = load_model(f"saved_models/{selected_file}")
-        st.success(f"✅ Keras model loaded: {selected_file}")
-    else:
-        st.error("❌ Unsupported file type.")
+# Create the folder if it doesn't exist
+os.makedirs(models_path, exist_ok=True)
+
+# Check for available models
+model_files = os.listdir(models_path)
+
+if model_files:
+    selected_file = st.selectbox("Select a saved model", model_files)
+
+    if st.button("Load Model"):
+        try:
+            if selected_file.endswith(".pkl"):
+                model = joblib.load(os.path.join(models_path, selected_file))
+                st.success(f"✅ Sklearn model loaded: {selected_file}")
+            elif selected_file.endswith(".h5"):
+                model = load_model(os.path.join(models_path, selected_file))
+                st.success(f"✅ Keras model loaded: {selected_file}")
+            else:
+                st.error("❌ Unsupported file format.")
+        except Exception as e:
+            st.error(f"❌ Error loading model: {e}")
+else:
+    st.warning("⚠️ No models found in 'saved_models/'. Please train and save your models first.")
