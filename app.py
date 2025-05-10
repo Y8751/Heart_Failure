@@ -3,6 +3,9 @@ import joblib
 from tensorflow.keras.models import load_model
 import streamlit as st
 
+st.write("🗂 Current working directory:", os.getcwd())
+st.write("📁 Files in saved_models/:", os.listdir("saved_models") if os.path.exists("saved_models") else "Folder not found.")
+
 st.title("📁 Load Saved Model")
 
 # Define the folder path
