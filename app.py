@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 import tempfile
 
-st.title("🔍 Predict Heart Disease from Input")
+st.title("🔍 Predict Heart Disease !")
 
 # Upload model
 model_file = st.file_uploader("Upload a trained model (.pkl or .h5)", type=["pkl", "h5"])
